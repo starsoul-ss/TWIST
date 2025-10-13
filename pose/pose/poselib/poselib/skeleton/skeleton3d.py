@@ -901,7 +901,7 @@ class SkeletonState(Serializable):
         # print("new_skeleton_tree: ", new_skeleton_tree)
         # plot_skeleton_state(source_tpose)
 
-        # TODO: combine the following steps before STEP 3
+        #  combine the following steps before STEP 3
         source_tpose = source_tpose._transfer_to(new_skeleton_tree)
         source_state = self._transfer_to(new_skeleton_tree)
 

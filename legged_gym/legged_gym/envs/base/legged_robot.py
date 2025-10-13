@@ -495,7 +495,7 @@ class LeggedRobot(BaseTask):
         # actions_scaled[:, 11:] = 0.0
         control_type = self.cfg.control.control_type
         if control_type=="P":
-            if not self.cfg.domain_rand.randomize_motor:  # TODO add strength to gain directly
+            if not self.cfg.domain_rand.randomize_motor:  #  add strength to gain directly
                 torques = self.p_gains*(actions_scaled + self.default_dof_pos_all - self.dof_pos) - self.d_gains*self.dof_vel
             else:
                 torques = self.motor_strength[0] * self.p_gains*(actions_scaled + self.default_dof_pos_all - self.dof_pos) - self.motor_strength[1] * self.d_gains*self.dof_vel

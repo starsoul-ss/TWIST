@@ -181,7 +181,7 @@ class G1RealWorldEnv:
             self.qj[start_idx + i] = self.low_state.motor_state[self.config.arm_waist_joint2motor_idx[i]].q
             self.dqj[start_idx + i] = self.low_state.motor_state[self.config.arm_waist_joint2motor_idx[i]].dq
             self.tauj[start_idx + i] = self.low_state.motor_state[self.config.arm_waist_joint2motor_idx[i]].tau_est
-        # TODO: add wrist
+        
             
         # imu_state quaternion: w, x, y, z
         quat = self.low_state.imu_state.quaternion

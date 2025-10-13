@@ -9,7 +9,7 @@
 
 # bash eval_teacher.sh t1 0331_amass_omomo
 
-export CUDA_VISIBLE_DEVICES=1
+export CUDA_VISIBLE_DEVICES=6
 
 robot_name=$1
 task_name="${robot_name}_priv_mimic"
@@ -24,6 +24,7 @@ python play.py --task "${task_name}" \
                 --exptid "${exptid}" \
                 --num_envs 1 \
                 --record_video \
+                # --headless \
                 # --checkpoint 13000 \
                 # --record_log \
                 # --use_jit \
