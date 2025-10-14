@@ -57,7 +57,20 @@ class HumanoidChar(LeggedRobot):
         
     def _init_buffers(self):
         super()._init_buffers()
-        
+
+        # env0 = self.envs[0]
+        # actor0 = self.actor_handles[0]
+        # # 获取 name->id 映射
+        # body_dict = self.gym.get_actor_rigid_body_dict(env0, actor0)
+        # print("=== Actor 0 rigid bodies (name -> id) ===")
+        # for name, idx in body_dict.items():
+        #     print(f"  {name} -> {idx}")
+        # # 获取按顺序的 body names 列表
+        # body_names = self.gym.get_actor_rigid_body_names(env0, actor0)
+        # print("=== Actor 0 rigid body names by index ===")
+        # for i, n in enumerate(body_names):
+        #     print(f"  idx {i}: {n}")
+
         self._ref_body_pos = torch.zeros_like(self.rigid_body_states[..., :3])
         self.feet_force_sum = torch.ones(self.num_envs, 2, device=self.device)
         key_bodies = self.cfg.motion.key_bodies

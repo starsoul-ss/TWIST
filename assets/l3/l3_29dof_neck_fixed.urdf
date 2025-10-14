@@ -1638,7 +1638,13 @@
       xyz="0 0 0" />
   </joint>
 
-
+  <!-- IMU -->
+  <link name="chest_in_torso"></link>
+  <joint name="chest_in_torso_joint" type="fixed">
+    <origin xyz="-0.03959 -0.00224 0.14792" rpy="0 0 0"/>
+    <parent link="torso_base_link"/>
+    <child link="chest_in_torso"/>
+  </joint>
 
   <!--   left_arm part    -->
   <joint

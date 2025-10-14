@@ -7,7 +7,7 @@ class L3MimicPrivCfg(HumanoidMimicCfg):
         tar_obs_steps = [1, 5, 10, 15, 20, 25, 30, 35, 40, 45,
                          50, 55, 60, 65, 70, 75, 80, 85, 90, 95,]#TODO 不知道这个是啥
         
-        num_envs = 4096
+        num_envs = 2048
         num_actions = 29
         obs_type = 'priv' # 'student'
         n_priv_latent = 4 + 1 + 2*num_actions
@@ -15,7 +15,7 @@ class L3MimicPrivCfg(HumanoidMimicCfg):
         n_priv = 0
         
         n_proprio = 3 + 2 + 3*num_actions
-        n_priv_mimic_obs = len(tar_obs_steps) * (8 + num_actions + 3*9) # Hardcode for now, 9 is base, 9 is the number of key bodies TODO 这里的9需要改吗
+        n_priv_mimic_obs = len(tar_obs_steps) * (8 + num_actions + 3*9) # Hardcode for now, 9 is base, 9 is the number of key bodies 
         n_mimic_obs = 8 + 29 # 29 for dof pos
         n_priv_info = 3 + 1 + 3*9 + 2 + 4 + 1 + 2*num_actions # base lin vel, root height, key body pos, contact mask, priv latent
         history_len = 10
@@ -48,9 +48,9 @@ class L3MimicPrivCfg(HumanoidMimicCfg):
         dof_err_w = [1.0, 0.8, 0.8, 1.0, 0.5, 0.5, # Left Leg
                      1.0, 0.8, 0.8, 1.0, 0.5, 0.5, # Right Leg
                      0.6, 0.6, 0.6, # waist yaw, roll, pitch
-                     0.8, 0.8, 0.8, 1.0, # Left Arm
-                     0.8, 0.8, 0.8, 1.0, # Right Arm
-                     ]#TODO 不知道这个是啥
+                     0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 1.0, # Left Arm
+                     0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 1.0, # Right Arm
+                     ]
     
         
 
@@ -66,7 +66,7 @@ class L3MimicPrivCfg(HumanoidMimicCfg):
         horizontal_scale = 0.1
     
     class init_state(HumanoidMimicCfg.init_state):
-        pos = [0, 0, 1.0]#TODO 这里的初始高度需要改吗
+        pos = [0, 0, 1.0]#TODO 这里是base的初始高度
         default_joint_angles = {
             'left_hip_roll_joint': 0.0,
             'left_hip_yaw_joint': 0.0,
@@ -100,7 +100,7 @@ class L3MimicPrivCfg(HumanoidMimicCfg):
         }
     
     class control(HumanoidMimicCfg.control):
-        #TODO 确定需要几个关键点，可能还需要据此修改上面的维度
+       
         stiffness = {'hip_yaw': 100,
                      'hip_roll': 100,
                      'hip_pitch': 100,
@@ -109,6 +109,8 @@ class L3MimicPrivCfg(HumanoidMimicCfg):
                      'waist': 150,
                      'shoulder': 40,
                      'elbow': 40,
+                     'wrist':40,
+                     'arm':40,
                      }  # [N*m/rad]
         damping = {  'hip_yaw': 2,
                      'hip_roll': 2,
@@ -118,6 +120,8 @@ class L3MimicPrivCfg(HumanoidMimicCfg):
                      'waist': 4,
                      'shoulder': 5,
                      'elbow': 5,
+                     'wrist':5,
+                     'arm':5,
                      }  # [N*m/rad]  # [N*m*s/rad]
         
         action_scale = 0.5
@@ -138,16 +142,16 @@ class L3MimicPrivCfg(HumanoidMimicCfg):
         
         # for both joint and link name
         torso_name: str = 'pelvis'  # humanoid pelvis part
-        chest_name: str = 'imu_in_torso'  # TODO humanoid chest part
+        chest_name: str = 'torso_base_link'  # TODO 要确定一下imu正对torso的位置
 
-        # for link name TODO 需要对照一下g1的
+        # for link name 
         thigh_name: str = 'hip'
         shank_name: str = 'knee'
         foot_name: str = 'ankle_roll_link'  # foot_pitch is not used
         waist_name: list = ['torso_link', 'waist_roll_link', 'waist_yaw_link']
         upper_arm_name: str = 'shoulder_roll_link'
-        lower_arm_name: str = 'elbow_link'
-        hand_name: list = ['right_rubber_hand', 'left_rubber_hand']
+        lower_arm_name: str = 'elbow_pitch_link'
+        hand_name: list = ['right_hand_flange_link', 'left_hand_flange_link']
 
         feet_bodies = ['left_ankle_roll_link', 'right_ankle_roll_link']
         n_lower_body_dofs: int = 12
@@ -289,10 +293,10 @@ class L3MimicPrivCfg(HumanoidMimicCfg):
     class motion(HumanoidMimicCfg.motion):
         motion_curriculum = True
         motion_curriculum_gamma = 0.01
-        #TODO 添加key bodys
-        key_bodies = ["left_rubber_hand", "right_rubber_hand", "left_ankle_roll_link", "right_ankle_roll_link", "left_knee_link", "right_knee_link", "left_elbow_link", "right_elbow_link", "head_mocap"] # 9 key bodies
-        upper_key_bodies = ["left_rubber_hand", "right_rubber_hand", "left_elbow_link", "right_elbow_link", "head_mocap"]
         
+        key_bodies = ["left_wrist_roll_link", "right_wrist_roll_link", "left_ankle_roll_link", "right_ankle_roll_link", "left_knee_link", "right_knee_link", "left_elbow_pitch_link", "right_elbow_pitch_link", "torso_link"] # 9 key bodies
+        upper_key_bodies = ["left_wrist_roll_link", "right_wrist_roll_link", "left_elbow_pitch_link", "right_elbow_pitch_link", "torso_link"] # 5 key bodies
+
         motion_file = f"{LEGGED_GYM_ROOT_DIR}/motion_data_configs/l3_dataset.yaml"
         
         reset_consec_frames = 30
@@ -338,7 +342,7 @@ class L3MimicStuRLCfg(L3MimicPrivCfg):
         
         n_proprio = 3 + 2 + 3*num_actions
         n_priv_mimic_obs = len(tar_obs_steps) * (8 + num_actions + 3*9) # Hardcode for now, 9 is the number of key bodies
-        n_mimic_obs = 8 + 29 # 23 for dof pos
+        n_mimic_obs = 8 + 29 # 29 for dof pos
         
         n_priv_info = 3 + 1 + 3*9 + 2 + 4 + 1 + 2*num_actions # base lin vel, root height, key body pos, contact mask, priv latent
         history_len = 10
@@ -453,7 +457,7 @@ class L3MimicPrivCfgPPO(HumanoidMimicCfgPPO):
         # schedule = 'fixed' # could be adaptive, fixed
     
     class policy(HumanoidMimicCfgPPO.policy):
-        action_std = [0.7] * 12 + [0.4] * 3 + [0.5] * 8
+        action_std = [0.7] * 12 + [0.4] * 3 + [0.5] * 14
         init_noise_std = 1.0
         obs_context_len = 11
         actor_hidden_dims = [512, 512, 256, 128]
@@ -504,7 +508,7 @@ class L3MimicStuRLCfgDAgger(L3MimicStuRLCfg):
         # dagger_coef_min = 0.0  # Minimum value for dagger_coef
 
     class policy(HumanoidMimicCfgPPO.policy):
-        action_std = [0.7] * 12 + [0.4] * 3 + [0.5] * 8
+        action_std = [0.7] * 12 + [0.4] * 3 + [0.5] * 14
         init_noise_std = 1.0
         obs_context_len = 11
         actor_hidden_dims = [512, 512, 256, 128]

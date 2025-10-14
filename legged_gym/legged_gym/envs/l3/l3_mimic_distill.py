@@ -30,47 +30,41 @@ def l3_body_from_34_to_52(body_pos_34: torch.Tensor) -> torch.Tensor:
     # 若对应不到（例如手指关节），则为 -1。
     idx_map_52_list = [-1] * 52
     # 直接在列表中指定 38->52 的映射：
-    # 0~29 不变, 30->37, 31->38, 32->39, 33->40, 34->41, 35->42, 36->43, 37->44
-    #TODO 是否需要修改？为什么是52维
     # ---------------------------------------------------------------------
     idx_map_52_list[0]  = 0   # pelvis
-    idx_map_52_list[1]  = 1
-    idx_map_52_list[2]  = 2
-    idx_map_52_list[3]  = 3
-    idx_map_52_list[4]  = 4
-    idx_map_52_list[5]  = 5
-    idx_map_52_list[6]  = 6
-    idx_map_52_list[7]  = 7
-    idx_map_52_list[8]  = 8
-    idx_map_52_list[9]  = 9
-    idx_map_52_list[10] = 10
-    idx_map_52_list[11] = 11
-    idx_map_52_list[12] = 12
-    idx_map_52_list[13] = 13
-    idx_map_52_list[14] = 14
-    idx_map_52_list[15] = 15
-    idx_map_52_list[16] = 16
-    idx_map_52_list[17] = 17
-    idx_map_52_list[18] = 18
-    idx_map_52_list[19] = 19
-    idx_map_52_list[20] = 20
-    idx_map_52_list[21] = 21
-    idx_map_52_list[22] = 22
-    idx_map_52_list[23] = 23
-    idx_map_52_list[24] = 24
-    idx_map_52_list[25] = 25
-    idx_map_52_list[26] = 26
-    idx_map_52_list[27] = 27
-    idx_map_52_list[28] = 28
-    idx_map_52_list[29] = 29
-    idx_map_52_list[37] = 30
-    idx_map_52_list[38] = 31
-    idx_map_52_list[39] = 32
-    idx_map_52_list[40] = 33
-    idx_map_52_list[41] = 34
-    idx_map_52_list[42] = 35
-    idx_map_52_list[43] = 36
-    idx_map_52_list[44] = 37
+    idx_map_52_list[2]  = 1
+    idx_map_52_list[3]  = 2
+    idx_map_52_list[4]  = 3
+    idx_map_52_list[5]  = 4
+    idx_map_52_list[6]  = 5
+    idx_map_52_list[7]  = 6
+    idx_map_52_list[8]  = 7
+    idx_map_52_list[9]  = 8
+    idx_map_52_list[10]  = 9
+    idx_map_52_list[11] = 10
+    idx_map_52_list[12] = 11
+    idx_map_52_list[13] = 12
+    idx_map_52_list[14] = 13
+    idx_map_52_list[15] = 14
+    idx_map_52_list[18] = 15
+    idx_map_52_list[19] = 16
+    idx_map_52_list[20] = 17
+    idx_map_52_list[27] = 18
+    idx_map_52_list[28] = 19
+    idx_map_52_list[29] = 20
+    idx_map_52_list[30] = 21
+    idx_map_52_list[31] = 22
+    idx_map_52_list[32] = 23
+    idx_map_52_list[33] = 24
+    idx_map_52_list[34] = 25
+    idx_map_52_list[44] = 26
+    idx_map_52_list[45] = 27
+    idx_map_52_list[46] = 28
+    idx_map_52_list[47] = 29
+    idx_map_52_list[48] = 30
+    idx_map_52_list[49] = 31
+    idx_map_52_list[50] = 32
+    idx_map_52_list[51] = 33
     # 其余下标(手指相关)依旧保持 -1
 
     # 转换成 PyTorch 张量，放到和输入相同的 device 上
@@ -131,7 +125,6 @@ class L3MimicDistill(HumanoidMimic):
         self._ref_dof_pos[env_ids] = dof_pos
         self._ref_dof_vel[env_ids] = dof_vel
         if body_pos.shape[1] != self._ref_body_pos[env_ids].shape[1]:
-            print("body have ",self._ref_body_pos[env_ids].shape[1])
             body_pos = l3_body_from_34_to_52(body_pos)
         self._ref_body_pos[env_ids] = convert_to_global_root_body_pos(root_pos=root_pos, root_rot=root_rot, body_pos=body_pos)
     
@@ -150,7 +143,6 @@ class L3MimicDistill(HumanoidMimic):
         self._ref_dof_pos[:] = dof_pos
         self._ref_dof_vel[:] = dof_vel
         if body_pos.shape[1] != self._ref_body_pos.shape[1]:
-            print("body have ",self._ref_body_pos.shape[1])
             body_pos = l3_body_from_34_to_52(body_pos)
         self._ref_body_pos[:] = convert_to_global_root_body_pos(root_pos=root_pos, root_rot=root_rot, body_pos=body_pos)
         
@@ -278,7 +270,7 @@ class L3MimicDistill(HumanoidMimic):
             proprio_obs_buf += 0.
         dof_vel_start_dim = 5 + self.dof_pos.shape[1]
 
-        # disable ankle dof TODO 更新序号
+        # disable ankle dof
         ankle_idx = [4, 5, 10, 11]
         proprio_obs_buf[:, [dof_vel_start_dim + i for i in ankle_idx]] = 0.
         
@@ -345,13 +337,13 @@ class L3MimicDistill(HumanoidMimic):
 ############################################################################################################
 ##################################### Extra Reward Functions################################################
 ############################################################################################################
-#TODO 更改序号
+
     def _reward_waist_dof_acc(self):
-        waist_dof_idx = [13, 14]
+        waist_dof_idx = [12, 13]
         return torch.sum(torch.square((self.last_dof_vel - self.dof_vel) / self.dt)[:, waist_dof_idx], dim=1)
     
     def _reward_waist_dof_vel(self):
-        waist_dof_idx = [13, 14]
+        waist_dof_idx = [12, 13]
         return torch.sum(torch.square(self.dof_vel[:, waist_dof_idx]), dim=1)
     
     def _reward_ankle_dof_acc(self):

@@ -124,18 +124,21 @@ class TaskRegistry():
         # if no args passed get command line arguments
         if args is None:
             args = get_args()
+            print("No args provided, parsed command line arguments:", args)
         # if config files are passed use them, otherwise load from the name
         if train_cfg is None:
             if name is None:
                 raise ValueError("Either 'name' or 'train_cfg' must be not None")
             # load config files
+            print(f"Loading train_cfg for {name}")
             _, train_cfg = self.get_cfgs(name)
         else:
             if name is not None:
                 print(f"'train_cfg' provided -> Ignoring 'name={name}'")
         # override cfg from args (if specified)
         _, train_cfg = update_cfg_from_args(None, train_cfg, args)
-        
+        print("Final train_cfg:", train_cfg)
+        # print("args are:", args)
         if log_root=="default":
             log_root = os.path.join(LEGGED_GYM_ROOT_DIR, 'logs', train_cfg.runner.experiment_name)
             log_dir = os.path.join(log_root, datetime.now().strftime('%b%d_%H-%M-%S') + '_' + train_cfg.runner.run_name)
@@ -146,6 +149,7 @@ class TaskRegistry():
         
         train_cfg_dict = class_to_dict(train_cfg)
         runner_class = eval(train_cfg.runner.runner_class_name)
+        print(f"Creating {train_cfg.runner.runner_class_name} runner")
         runner = runner_class(env, 
                                 train_cfg_dict, 
                                 log_dir, 
@@ -153,6 +157,8 @@ class TaskRegistry():
                                 device=args.rl_device, **kwargs)
         #save resume path before creating a new log_dir
         resume = train_cfg.runner.resume
+        print("resume is ", resume)
+        print("args.resumeid is ", args.resumeid)
         if args.resumeid:
             log_root = LEGGED_GYM_ROOT_DIR + f"/logs/{args.proj_name}/" + args.resumeid
             resume = True
@@ -173,3 +179,4 @@ class TaskRegistry():
 
 # make global task registry
 task_registry = TaskRegistry()
+print("Initialized global task registry")
