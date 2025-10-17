@@ -9,9 +9,9 @@ from pose.utils import torch_utils
 from legged_gym.envs.base.legged_robot import euler_from_quaternion
 from legged_gym.envs.base.humanoid_char import convert_to_local_root_body_pos, convert_to_global_root_body_pos
 
-def l3_body_from_34_to_52(body_pos_34: torch.Tensor) -> torch.Tensor:
+def l3_body_from_34_to_51(body_pos_34: torch.Tensor) -> torch.Tensor:
     """
-    将形状 (N, 34, 3) 的关节坐标转换为形状 (N, 52, 3)。
+    将形状 (N, 34, 3) 的关节坐标转换为形状 (N, 51, 3)。
     多出来的手指等关节在输出中将填充为 (0, 0, 0)。
 
     参数:
@@ -21,70 +21,70 @@ def l3_body_from_34_to_52(body_pos_34: torch.Tensor) -> torch.Tensor:
 
     返回:
     -------
-        body_pos_52 : torch.Tensor
-            大小为 (N, 52, 3) 的关节坐标
+        body_pos_51 : torch.Tensor
+            大小为 (N, 51, 3) 的关节坐标
     """
 
-    # 构建一个大小为 52 的整型索引张量，用于说明：
-    # “52-link 的每个关节，对应到 38-link 中的哪一个下标？”
+    # 构建一个大小为 51 的整型索引张量，用于说明：
+    # “51-link 的每个关节，对应到 38-link 中的哪一个下标？”
     # 若对应不到（例如手指关节），则为 -1。
-    idx_map_52_list = [-1] * 52
-    # 直接在列表中指定 38->52 的映射：
+    idx_map_51_list = [-1] * 51
+    # 直接在列表中指定 38->51 的映射：
     # ---------------------------------------------------------------------
-    idx_map_52_list[0]  = 0   # pelvis
-    idx_map_52_list[2]  = 1
-    idx_map_52_list[3]  = 2
-    idx_map_52_list[4]  = 3
-    idx_map_52_list[5]  = 4
-    idx_map_52_list[6]  = 5
-    idx_map_52_list[7]  = 6
-    idx_map_52_list[8]  = 7
-    idx_map_52_list[9]  = 8
-    idx_map_52_list[10]  = 9
-    idx_map_52_list[11] = 10
-    idx_map_52_list[12] = 11
-    idx_map_52_list[13] = 12
-    idx_map_52_list[14] = 13
-    idx_map_52_list[15] = 14
-    idx_map_52_list[18] = 15
-    idx_map_52_list[19] = 16
-    idx_map_52_list[20] = 17
-    idx_map_52_list[27] = 18
-    idx_map_52_list[28] = 19
-    idx_map_52_list[29] = 20
-    idx_map_52_list[30] = 21
-    idx_map_52_list[31] = 22
-    idx_map_52_list[32] = 23
-    idx_map_52_list[33] = 24
-    idx_map_52_list[34] = 25
-    idx_map_52_list[44] = 26
-    idx_map_52_list[45] = 27
-    idx_map_52_list[46] = 28
-    idx_map_52_list[47] = 29
-    idx_map_52_list[48] = 30
-    idx_map_52_list[49] = 31
-    idx_map_52_list[50] = 32
-    idx_map_52_list[51] = 33
+    idx_map_51_list[0]  = 0   # pelvis
+    idx_map_51_list[2]  = 1
+    idx_map_51_list[3]  = 2
+    idx_map_51_list[4]  = 3
+    idx_map_51_list[5]  = 4
+    idx_map_51_list[6]  = 5
+    idx_map_51_list[7]  = 6
+    idx_map_51_list[8]  = 7
+    idx_map_51_list[9]  = 8
+    idx_map_51_list[10]  = 9
+    idx_map_51_list[11] = 10
+    idx_map_51_list[12] = 11
+    idx_map_51_list[13] = 12
+    idx_map_51_list[14] = 13
+    idx_map_51_list[15] = 14
+    idx_map_51_list[18] = 15
+    idx_map_51_list[19] = 16
+    idx_map_51_list[20] = 17
+    idx_map_51_list[26] = 18
+    idx_map_51_list[27] = 19
+    idx_map_51_list[28] = 20
+    idx_map_51_list[29] = 21
+    idx_map_51_list[30] = 22
+    idx_map_51_list[31] = 23
+    idx_map_51_list[32] = 24
+    idx_map_51_list[33] = 25
+    idx_map_51_list[43] = 26
+    idx_map_51_list[44] = 27
+    idx_map_51_list[45] = 28
+    idx_map_51_list[46] = 29
+    idx_map_51_list[47] = 30
+    idx_map_51_list[48] = 31
+    idx_map_51_list[49] = 32
+    idx_map_51_list[50] = 33
     # 其余下标(手指相关)依旧保持 -1
 
     # 转换成 PyTorch 张量，放到和输入相同的 device 上
-    idx_map_52 = torch.tensor(idx_map_52_list, 
+    idx_map_51 = torch.tensor(idx_map_51_list, 
                               dtype=torch.long, 
                               device=body_pos_34.device)
 
-    # 创建输出张量，大小 (N, 52, 3)，默认填零
+    # 创建输出张量，大小 (N, 51, 3)，默认填零
     N = body_pos_34.shape[0]
-    body_pos_52 = torch.zeros((N, 52, 3), 
+    body_pos_51 = torch.zeros((N, 51, 3), 
                               dtype=body_pos_34.dtype, 
                               device=body_pos_34.device)
 
-    # 构建一个布尔掩码，筛选出 idx_map_52 >= 0 的关节
-    valid_mask = (idx_map_52 >= 0)
+    # 构建一个布尔掩码，筛选出 idx_map_51 >= 0 的关节
+    valid_mask = (idx_map_51 >= 0)
 
     # 对有效关节通过高级索引直接复制，无需对 N 进行循环
-    body_pos_52[:, valid_mask, :] = body_pos_34[:, idx_map_52[valid_mask], :]
+    body_pos_51[:, valid_mask, :] = body_pos_34[:, idx_map_51[valid_mask], :]
 
-    return body_pos_52
+    return body_pos_51
 
 
 
@@ -125,7 +125,7 @@ class L3MimicDistill(HumanoidMimic):
         self._ref_dof_pos[env_ids] = dof_pos
         self._ref_dof_vel[env_ids] = dof_vel
         if body_pos.shape[1] != self._ref_body_pos[env_ids].shape[1]:
-            body_pos = l3_body_from_34_to_52(body_pos)
+            body_pos = l3_body_from_34_to_51(body_pos)
         self._ref_body_pos[env_ids] = convert_to_global_root_body_pos(root_pos=root_pos, root_rot=root_rot, body_pos=body_pos)
     
     
@@ -143,7 +143,7 @@ class L3MimicDistill(HumanoidMimic):
         self._ref_dof_pos[:] = dof_pos
         self._ref_dof_vel[:] = dof_vel
         if body_pos.shape[1] != self._ref_body_pos.shape[1]:
-            body_pos = l3_body_from_34_to_52(body_pos)
+            body_pos = l3_body_from_34_to_51(body_pos)
         self._ref_body_pos[:] = convert_to_global_root_body_pos(root_pos=root_pos, root_rot=root_rot, body_pos=body_pos)
         
     def _update_motion_difficulty(self, env_ids):

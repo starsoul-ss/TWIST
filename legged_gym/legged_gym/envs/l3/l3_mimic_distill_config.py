@@ -7,7 +7,7 @@ class L3MimicPrivCfg(HumanoidMimicCfg):
         tar_obs_steps = [1, 5, 10, 15, 20, 25, 30, 35, 40, 45,
                          50, 55, 60, 65, 70, 75, 80, 85, 90, 95,]#TODO 不知道这个是啥
         
-        num_envs = 2048
+        num_envs = 4096
         num_actions = 29
         obs_type = 'priv' # 'student'
         n_priv_latent = 4 + 1 + 2*num_actions
@@ -66,7 +66,7 @@ class L3MimicPrivCfg(HumanoidMimicCfg):
         horizontal_scale = 0.1
     
     class init_state(HumanoidMimicCfg.init_state):
-        pos = [0, 0, 1.0]#TODO 这里是base的初始高度
+        pos = [0, 0, 1.0]
         default_joint_angles = {
             'left_hip_roll_joint': 0.0,
             'left_hip_yaw_joint': 0.0,
@@ -138,18 +138,18 @@ class L3MimicPrivCfg(HumanoidMimicCfg):
     class asset(HumanoidMimicCfg.asset):
        
         # file = f'{LEGGED_GYM_ROOT_DIR}/../assets/g1/g1_custom_collision_with_fixed_hand.urdf'
-        file = f'{LEGGED_GYM_ROOT_DIR}/../assets/l3/l3_29dof_neck_fixed.urdf'
+        file = f'{LEGGED_GYM_ROOT_DIR}/../assets/l3/l3_29dof_neck_fixed_leg_zero_offset_straight.urdf'
         
         # for both joint and link name
         torso_name: str = 'pelvis'  # humanoid pelvis part
-        chest_name: str = 'torso_base_link'  # TODO 要确定一下imu正对torso的位置
+        chest_name: str = 'torso_base_link'  # 
 
         # for link name 
         thigh_name: str = 'hip'
         shank_name: str = 'knee'
         foot_name: str = 'ankle_roll_link'  # foot_pitch is not used
-        waist_name: list = ['torso_link', 'waist_roll_link', 'waist_yaw_link']
-        upper_arm_name: str = 'shoulder_roll_link'
+        waist_name: list = ['waist_pitch_link', 'waist_roll_link', 'waist_yaw_link']
+        upper_arm_name: str = 'shoulder_pitch_link'
         lower_arm_name: str = 'elbow_pitch_link'
         hand_name: list = ['right_hand_flange_link', 'left_hand_flange_link']
 
@@ -157,7 +157,7 @@ class L3MimicPrivCfg(HumanoidMimicCfg):
         n_lower_body_dofs: int = 12
 
         penalize_contacts_on = ["shoulder", "elbow", "hip", "knee"]
-        terminate_after_contacts_on = ['torso_link']
+        terminate_after_contacts_on = ['torso_base_link']
         
         
         # ========================= Inertia =========================
@@ -294,8 +294,8 @@ class L3MimicPrivCfg(HumanoidMimicCfg):
         motion_curriculum = True
         motion_curriculum_gamma = 0.01
         
-        key_bodies = ["left_wrist_roll_link", "right_wrist_roll_link", "left_ankle_roll_link", "right_ankle_roll_link", "left_knee_link", "right_knee_link", "left_elbow_pitch_link", "right_elbow_pitch_link", "torso_link"] # 9 key bodies
-        upper_key_bodies = ["left_wrist_roll_link", "right_wrist_roll_link", "left_elbow_pitch_link", "right_elbow_pitch_link", "torso_link"] # 5 key bodies
+        key_bodies = ["left_wrist_pitch_link", "right_wrist_pitch_link", "left_ankle_roll_link", "right_ankle_roll_link", "left_knee_link", "right_knee_link", "left_shoulder_pitch_link", "right_shoulder_pitch_link", "torso_link"] # 9 key bodies
+        upper_key_bodies = ["left_wrist_pitch_link", "right_wrist_pitch_link", "left_shoulder_pitch_link", "right_shoulder_pitch_link", "torso_link"] # 5 key bodies
 
         motion_file = f"{LEGGED_GYM_ROOT_DIR}/motion_data_configs/l3_dataset.yaml"
         
@@ -491,7 +491,7 @@ class L3MimicStuRLCfgDAgger(L3MimicStuRLCfg):
         resume_path = None
         
         teacher_experiment_name = 'test'
-        teacher_proj_name = 'g1_priv_mimic'
+        teacher_proj_name = 'l3_priv_mimic'
         teacher_checkpoint = -1
         eval_student = False
 
